@@ -663,48 +663,38 @@ THREE.OrbitControls = function ( object, domElement ) {
 		event.preventDefault();
 
 		switch ( event.button ) {
-
 			case scope.mouseButtons.ORBIT:
-
 				if ( scope.enableRotate === false ) return;
 
-				handleMouseDownRotate( event );
-
-				state = STATE.ROTATE;
-
-				break;
-
+				if (event.shiftKey) { // if they shift key is being pressed as well, we want to pan instead of orbit
+					handleMouseDownPan( event );
+					state = STATE.PAN;
+					break;
+				} else {
+					handleMouseDownRotate( event );
+					state = STATE.ROTATE;
+					break;
+				}
 			case scope.mouseButtons.ZOOM:
-
 				if ( scope.enableZoom === false ) return;
 
 				handleMouseDownDolly( event );
-
 				state = STATE.DOLLY;
-
 				break;
-
 			case scope.mouseButtons.PAN:
-
 				if ( scope.enablePan === false ) return;
 
 				handleMouseDownPan( event );
-
 				state = STATE.PAN;
-
 				break;
-
 		}
 
 		if ( state !== STATE.NONE ) {
-
 			document.addEventListener( 'mousemove', onMouseMove, false );
 			document.addEventListener( 'mouseup', onMouseUp, false );
 
 			scope.dispatchEvent( startEvent );
-
 		}
-
 	}
 
 	function onMouseMove( event ) {
