@@ -1,149 +1,81 @@
-var viewer, link, filename, camera, controls, scene, mesh, renderer;
-
 $(document).ready(function() {
-	initializeModelViewer();
+  function onWindowResize() {
+  	camera.aspect = window.innerWidth / window.innerHeight;
+  	camera.updateProjectionMatrix();
+
+  	renderer.setSize( window.innerWidth, window.innerHeight );
+
+  	controls.handleResize();
+  	controls.update();
+  	renderer.render( scene, camera );
+  }
+
+  var redraw = true;
+  function animate() {
+  	requestAnimationFrame(animate);
+
+  	controls.update();
+  	if(redraw)
+  		renderer.render( scene, camera );
+  	redraw = false;
+  }
+
+  var camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.1, 100 );
+  camera.position.z = 4;
+
+  var controls = new THREE.TrackballControls( camera );
+  controls.rotateSpeed = 10.0;
+  controls.zoomSpeed = 1.5;
+  controls.panSpeed = 0.8;
+  controls.noZoom = false;
+  controls.noPan = false;
+  controls.staticMoving = true;
+  controls.dynamicDampingFactor = 0.3;
+  controls.keys = [ 65, 83, 68 ];
+  controls.addEventListener( 'change', function() { redraw = true; } );
+
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+  scene.add( new THREE.AmbientLight( 0x444444 ) );
+
+  var light1 = new THREE.DirectionalLight( 0xffffff, 1.0 );
+  light1.position.set( 1, 1, -1 );
+  scene.add( light1 );
+
+  var light2 = new THREE.DirectionalLight( 0xffffff, 1.0 );
+  light2.position.set( -1, -1, 1 );
+  scene.add( light2 );
+
+  var renderer = new THREE.WebGLRenderer( { antialias: false } );
+  renderer.setClearColor( scene.fog.color );
+  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize( window.innerWidth, window.innerHeight);
+
+  var viewer = document.getElementById( 'js-viewer-container');
+  viewer.appendChild( renderer.domElement );
+
+  var model = viewer.dataset.link;
+
+  /* An appropriate material can be used as a fourth arg for the NexusObject constructor
+
+  var texture = new THREE.DataTexture( new Uint8Array([1, 1, 1]), 1, 1, THREE.RGBFormat );
+  texture.needsUpdate = true;
+  var material = new THREE.MeshLambertMaterial( { color: 0xffffff, map: texture } );
+  */
+
+
+  function onNexusLoad() {
+  	var s   = 1/nexus_obj.geometry.boundingSphere.radius;
+  	var p = nexus_obj.geometry.boundingBox.getCenter().negate();
+  	nexus_obj.position.set(p.x*s, p.y*s, p.y*s); //.set(p.x, p.y, p.z); // = p; //.set(p.x, p.y, p.z);
+  	nexus_obj.scale.set(s, s, s);
+  	redraw = true;
+  }
+
+  var nexus_obj = new NexusObject(model, onNexusLoad, function() { redraw = true; }, renderer);
+  scene.add(nexus_obj);
+
+  window.addEventListener( 'resize', onWindowResize, false );
+
+  animate();
 });
-
-function initializeModelViewer() {
-	viewer = document.getElementById('js-viewer-container');
-
-	if (viewer !== null) {
-		link = viewer.dataset.link;
-		filename = viewer.dataset.filename;
-		screenshotType = viewer.dataset.screenshotType;
-		textureLoader = new THREE.TextureLoader();
-		textureLoader.setCrossOrigin("anonymous");
-
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-		scene = new THREE.Scene();
-
-		// configure viewer container
-		var width = viewer.offsetWidth / 2
-		viewer.style.height = width + "px"; // set height as width
-		renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer.setSize(viewer.offsetWidth, viewer.offsetHeight);
-		viewer.appendChild(renderer.domElement);
-
-		// configure camera
-		camera = new THREE.PerspectiveCamera(40, viewer.offsetWidth / viewer.offsetHeight, 1, 1000);
-		camera.position.z = 150;
-
-		// configure lights
-		var light = new THREE.DirectionalLight(0xffffff);
-		light.position.set(5, 5, 10);
-		scene.add(light);
-		var light = new THREE.DirectionalLight(0xffffff);
-		light.position.set(-10, -10, 0);
-		scene.add(light);
-		var light = new THREE.AmbientLight(0x545159);
-		scene.add(light);
-
-		// configure scene background
-		scene.background = new THREE.Color( 0xd3d3d3 );;
-
-		// handle resize
-		window.addEventListener('resize', onWindowResize, false);
-
-		// load model
-		var loader;
-
-		THREE.DRACOLoader.setDecoderPath("./draco_decoder.js");
-		THREE.DRACOLoader.setDecoderConfig({type: 'js'});
-		var loader = new THREE.DRACOLoader();
-
-		loader.load(link, function(geometry) {
-			// Set Up Mesh
-			var material = new THREE.MeshLambertMaterial({ color: 0x958D7B });
-
-			if (geometry instanceof THREE.BufferGeometry){
-				geometry = new THREE.Geometry().fromBufferGeometry(geometry);
-			}
-
-			mesh = new THREE.Mesh(geometry, material);
-			mesh.geometry.mergeVertices();
-			mesh.geometry.computeVertexNormals();
-			scene.add(mesh);
-
-			// Re-Position Camera
-			geometry.computeBoundingBox();
-
-			var center = geometry.boundingBox.getCenter();
-			var size = geometry.boundingBox.getSize();
-			var maxDim = Math.max(size.x, size.y, size.z);
-			var fov = camera.fov * (Math.PI / 180);
-			var cameraZ = Math.abs(maxDim / 4 * Math.tan(fov * 2)) * 1.25;
-			camera.position.set(center.x, center.y, cameraZ);
-
-			// Set far edge
-			var minZ = geometry.boundingBox.min.z;
-			var cameraToFarEdge = ( minZ < 0 ) ? -minZ + cameraZ : cameraZ - minZ;
-			camera.far = cameraToFarEdge * 3;
-			camera.updateProjectionMatrix();
-
-			// set camera to rotate around center of loaded object
-			controls.target = center;
-
-			// prevent camera from zooming out far enough to create far plane cutoff
-			controls.maxDistance = cameraToFarEdge * 2;
-
-			renderViewer();
-		});
-
-		$('.js-container-fullscreen').click(function() {
-			if (window.innerHeight == screen.height) {
-				document.webkitExitFullscreen();
-				onWindowResize();
-			} else {
-				this.parentNode.webkitRequestFullscreen();
-			}
-			setTimeout(function() { renderViewer(); }, 700); // re-render after fullscreen for distortion issues
-		});
-		$('.js-viewer-snapshot').click(function() {
-			try {
-				var strippedFilename = filename.replace(/\.[^/.]+$/, "");
-				var constructedFilename = strippedFilename + "_" + Date.now() + '.jpeg';
-				var imgData = renderer.domElement.toDataURL("image/jpeg");
-
-				downloadFile(imgData.replace("image/jpeg", "image/octet-stream"), constructedFilename)
-			} catch (e) {
-				console.log(e);
-				return;
-			}
-		});
-
-		// configure controls
-		controls = new THREE.OrbitControls(camera, renderer.domElement);
-		controls.addEventListener('change', renderViewer);
-		controls.enablePan = true;
-		controls.keys = {
-			LEFT: 68, // d key
-			UP: 83, // s key
-			RIGHT: 65, // a key
-			BOTTOM: 87 // w key
-		}
-	}
-}
-function onWindowResize() {
-	var width = viewer.offsetWidth / 2
-	viewer.style.height = width + "px"; // set height as width
-
-	camera.aspect = viewer.offsetWidth / viewer.offsetHeight;
-	camera.updateProjectionMatrix();
-	renderer.setSize(viewer.offsetWidth, viewer.offsetHeight);
-}
-function renderViewer() {
-	renderer.render(scene, camera);
-}
-function downloadFile(imgData, filename) {
-	var link = document.createElement('a');
-	if (typeof link.download === 'string') {
-		document.body.appendChild(link); //Firefox requires the link to be in the body
-		link.download = filename;
-		link.href = imgData;
-		link.click();
-		document.body.removeChild(link); //remove the link when done
-	} else {
-		location.replace(uri);
-	}
-}
