@@ -1,8 +1,6 @@
 var viewer, link, filename, camera, controls, scene, mesh, renderer;
 var map_arr = [
 	{
-		name: 'Bottom-band-j-756-256',
-		preview: "assets/images/test-text/Bottom-band-j-756-256/bottom_band_j_756.jpg",
 		repeat: {x: 8, y: 8},
 		maps: {
 			map: "assets/Bottom-band-j-756-256/Bottom-band-j-756-256_BASE.jpg",
@@ -13,8 +11,6 @@ var map_arr = [
 		}
 	},
 	{
-		name: 'Back-lining-32',
-		preview: "assets/images/test-text/Back-lining-32/back_lining.jpg",
 		repeat: {x: 64, y: 64},
 		maps: {
 			map: "assets/Back-lining-32/Back-lining-32_BASE.jpg",
@@ -180,7 +176,7 @@ function initializeModelViewer() {
 	}
 }
 
-function PBRmaterial(obj) {
+function changeMaps(obj) {
 	if(obj) {
 
 		if(!obj.repeat){
