@@ -41,7 +41,6 @@ var materials = [
 	}
 ];
 
-
 const textureLoader = new THREE.TextureLoader();
 
 
