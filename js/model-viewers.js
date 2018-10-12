@@ -36,7 +36,7 @@ var materials = [
 		emissive: new THREE.Color(0xff0000)
 	}
 ];
-
+const textureLoader = new THREE.TextureLoader();
 
 
 $(document).ready(function () {
