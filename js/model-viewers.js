@@ -1,4 +1,4 @@
-var scene
+var scene;
 $(document).ready(function () {
 	function onWindowResize() {
 		camera.aspect = window.innerWidth / window.innerHeight;
@@ -23,7 +23,7 @@ $(document).ready(function () {
 	}
 
 	var camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
-	camera.position.z = 50;
+	camera.position.z = 5;
 
 	var controls = new THREE.TrackballControls(camera);
 	controls.rotateSpeed = 10.0;
@@ -43,11 +43,6 @@ $(document).ready(function () {
 	scene.fog = new THREE.Fog(0x050505, 2000, 3500);
 	scene.add(new THREE.AmbientLight(0x444444));
 
-
-	var geometry = new THREE.SphereGeometry(5, 32, 32);
-	var material = new THREE.MeshBasicMaterial({color: 0xffff00});
-	var sphere = new THREE.Mesh(geometry, material);
-	scene.add(sphere);
 
 	var light1 = new THREE.DirectionalLight(0xffffff, 1.0);
 	light1.position.set(1, 1, -1);
@@ -86,15 +81,9 @@ $(document).ready(function () {
 	var nexus_obj = new NexusObject(model, onNexusLoad, function () {
 		redraw = true;
 	}, renderer);
+
+	console.log(nexus_obj);
 	scene.add(nexus_obj);
-
-	console.log('NEXUS', nexus_obj);
-
-	var box = new THREE.BoxHelper( nexus_obj, 0xffff00 );
-	scene.add( box );
-
-	var bbox = new THREE.Box3().setFromObject(nexus_obj);
-	console.log('BOXXX',bbox);
 
 	window.addEventListener('resize', onWindowResize, false);
 
