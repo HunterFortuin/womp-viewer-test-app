@@ -63,7 +63,7 @@ $(document).ready(function () {
 	}
 
 	var camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
-	camera.position.z = 5;
+	camera.position.z = 8;
 
 	var controls = new THREE.TrackballControls(camera);
 	controls.rotateSpeed = 10.0;
@@ -79,17 +79,24 @@ $(document).ready(function () {
 	});
 
 	scene = new THREE.Scene();
-	scene.background = new THREE.Color(0xfffff0);
+	scene.background = new THREE.Color(0xffffff);
 	scene.fog = new THREE.Fog(0x050505, 2000, 3500);
-	scene.add(new THREE.AmbientLight(0x444444));
+	//scene.add(new THREE.AmbientLight(0x444444));
 
+
+	var hemisphereLight = new THREE.HemisphereLight();
+	scene.add(hemisphereLight);
 
 	var light1 = new THREE.DirectionalLight(0xffffff, 1.0);
+	light1.name = 'directanial light 1';
 	light1.position.set(1, 1, -1);
+	light1.intensity = 0.25;
 	scene.add(light1);
 
 	var light2 = new THREE.DirectionalLight(0xffffff, 1.0);
+	light2.name = 'directanial light 2';
 	light2.position.set(-1, -1, 1);
+	light2.intensity = 0.25;
 	scene.add(light2);
 
 	var renderer = new THREE.WebGLRenderer({antialias: true});
@@ -117,29 +124,26 @@ $(document).ready(function () {
 		nexus_obj.scale.set(s, s, s);
 		redraw = true;
 
+
+		if(model.includes('thermos')){
+			nexus_obj.material.flatShading = true;
+			nexus_obj.material.needsUpdate = true;
+		}
 		console.log(nexus_obj);
-		//
-		// var geometry = nexus_obj.geometry;
-		//
-		// var material = new THREE.MeshStandardMaterial({color: 0xffffff});
-		//
-		// if (geometry instanceof THREE.BufferGeometry) {
-		// 	geometry = new THREE.Geometry().fromBufferGeometry(geometry);
-		// }
-		//
-		// var mesh = new THREE.Mesh(geometry, material);
-		// mesh.castShadow = true;
-		// mesh.receiveShadow = true;
-		// //mesh.geometry.mergeVertices();
-		// mesh.geometry.computeVertexNormals();
-		// scene.add(mesh);
 	}
+
+
+	var material = new THREE.MeshStandardMaterial({color: 0xffffff});
+
 
 	var nexus_obj = new NexusObject(model, onNexusLoad, function () {
 		redraw = true;
-	}, renderer, new THREE.MeshStandardMaterial({color: 0xffffff}));
+	}, renderer, material);
 
-	//console.log(nexus_obj);
+
+	scene.add(nexus_obj);
+
+	window.addEventListener('resize', onWindowResize, false);
 
 	function changeMaps(obj, mesh) {
 		if (obj) {
@@ -203,6 +207,8 @@ $(document).ready(function () {
 				alphaMap.dispose();
 
 			mesh.material.needsUpdate = true;
+
+			redraw = true;
 		}
 	}
 	function changeMaterial(obj, mesh) {
@@ -211,16 +217,8 @@ $(document).ready(function () {
 				mesh.material[key] = obj[key];
 		}
 		mesh.material.needsUpdate = true;
+		redraw = true;
 	}
-
-
-	scene.add(nexus_obj);
-
-	window.addEventListener('resize', onWindowResize, false);
-
-	window.doit = function (i) {
-		changeMaterial(materials[i], nexus_obj);
-	};
 
 	animate();
 });
