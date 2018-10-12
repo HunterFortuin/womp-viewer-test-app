@@ -1,4 +1,44 @@
 var scene;
+var map_arr = [
+	{
+		repeat: {x: 8, y: 8},
+		maps: {
+			map: "assets/Bottom-band-j-756-256/Bottom-band-j-756-256_BASE.jpg",
+			normalMap: "assets/Bottom-band-j-756-256/Bottom-band-j-756-256_NRM.jpg",
+			metalnessMap: "assets/Bottom-band-j-756-256/Bottom-band-j-756-256_MTL.jpg",
+			roughnessMap: "assets/Bottom-band-j-756-256/Bottom-band-j-756-256_ROUGH.jpg",
+			alphaMap: "assets/Bottom-band-j-756-256/Bottom-band-j-756-256_ALPHA.jpg"
+		}
+	},
+	{
+		repeat: {x: 64, y: 64},
+		maps: {
+			map: "assets/Back-lining-32/Back-lining-32_BASE.jpg",
+			normalMap: "assets/Back-lining-32/Back-lining-32_NRM.jpg",
+			metalnessMap: "assets/Back-lining-32/Back-lining-32_MTL.jpg",
+			roughnessMap: "assets/Back-lining-32/Back-lining-32_ROUGH.jpg",
+			alphaMap: "assets/Back-lining-32/Back-lining-32_ALPHA.jpg",
+		}
+
+	}
+];
+var materials = [
+	{
+		roughness: 0.2,
+		metalness: 0.3,
+		color: new THREE.Color(0xff0000),
+		emissive: new THREE.Color(0x000000)
+	},
+	{
+		roughness: 0.8,
+		metalness: 0.9,
+		color: new THREE.Color(0xff00ff),
+		emissive: new THREE.Color(0xff0000)
+	}
+];
+
+
+
 $(document).ready(function () {
 	function onWindowResize() {
 		camera.aspect = window.innerWidth / window.innerHeight;
@@ -101,11 +141,86 @@ $(document).ready(function () {
 
 	//console.log(nexus_obj);
 
+	function changeMaps(obj, mesh) {
+		if (obj) {
+
+			if (!obj.repeat) {
+				obj.repeat = {
+					x: 1,
+					y: 1
+				}
+			}
+
+			const map = mesh.material.map;
+			const normalMap = mesh.material.normalMap;
+			const metalnessMap = mesh.material.metalnessMap;
+			const roughnessMap = mesh.material.roughnessMap;
+			const alphaMap = mesh.material.alphaMap;
+
+			if (obj.maps.map) {
+				mesh.material.map = textureLoader.load(obj.maps.map);
+				mesh.material.map.wrapS = mesh.material.map.wrapT = 1000;
+				mesh.material.map.repeat.x = obj.repeat.x;
+				mesh.material.map.repeat.y = obj.repeat.y;
+			}
+			if (map)
+				map.dispose();
+
+			if (obj.maps.normalMap) {
+				mesh.material.normalMap = textureLoader.load(obj.maps.normalMap);
+				mesh.material.normalMap.wrapS = mesh.material.normalMap.wrapT = 1000;
+				mesh.material.normalMap.repeat.x = obj.repeat.x;
+				mesh.material.normalMap.repeat.y = obj.repeat.y;
+			}
+			if (normalMap)
+				normalMap.dispose();
+
+			if (obj.maps.metalnessMap) {
+				mesh.material.metalnessMap = textureLoader.load(obj.maps.metalnessMap);
+				mesh.material.metalnessMap.wrapS = mesh.material.metalnessMap.wrapT = 1000;
+				mesh.material.metalnessMap.repeat.x = obj.repeat.x;
+				mesh.material.metalnessMap.repeat.y = obj.repeat.y;
+			}
+			if (metalnessMap)
+				metalnessMap.dispose();
+
+			if (obj.maps.roughnessMap) {
+				mesh.material.roughnessMap = textureLoader.load(obj.maps.roughnessMap);
+				mesh.material.roughnessMap.wrapS = mesh.material.roughnessMap.wrapT = 1000;
+				mesh.material.roughnessMap.repeat.x = obj.repeat.x;
+				mesh.material.roughnessMap.repeat.y = obj.repeat.y;
+			}
+			if (roughnessMap)
+				roughnessMap.dispose();
+
+			if (obj.maps.alphaMap) {
+				mesh.material.alphaMap = textureLoader.load(obj.maps.alphaMap);
+				mesh.material.alphaMap.wrapS = mesh.material.alphaMap.wrapT = 1000;
+				mesh.material.alphaMap.repeat.x = obj.repeat.x;
+				mesh.material.alphaMap.repeat.y = obj.repeat.y;
+			}
+			if (alphaMap)
+				alphaMap.dispose();
+
+			mesh.material.needsUpdate = true;
+		}
+	}
+	function changeMaterial(obj, mesh) {
+		for (var key in obj) {
+			if (mesh.material[key])
+				mesh.material[key] = obj[key];
+		}
+		mesh.material.needsUpdate = true;
+	}
 
 
 	scene.add(nexus_obj);
 
 	window.addEventListener('resize', onWindowResize, false);
+
+	window.doit = function (i) {
+		changeMaterial(materials[i], nexus_obj);
+	};
 
 	animate();
 });
