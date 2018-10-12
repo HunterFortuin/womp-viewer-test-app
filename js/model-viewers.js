@@ -120,7 +120,7 @@ $(document).ready(function () {
 	function onNexusLoad() {
 		var s = 1 / nexus_obj.geometry.boundingSphere.radius;
 		var p = nexus_obj.geometry.boundingBox.getCenter().negate();
-		nexus_obj.position.set(p.x * s, p.y * s, p.y * s); //.set(p.x, p.y, p.z); // = p; //.set(p.x, p.y, p.z);
+		nexus_obj.position.set(p.x * s, p.y * s, p.z * s); //.set(p.x, p.y, p.z); // = p; //.set(p.x, p.y, p.z);
 		nexus_obj.scale.set(s, s, s);
 		redraw = true;
 
@@ -129,7 +129,7 @@ $(document).ready(function () {
 			nexus_obj.material.flatShading = true;
 			nexus_obj.material.needsUpdate = true;
 		}
-		console.log(nexus_obj);
+
 	}
 
 
