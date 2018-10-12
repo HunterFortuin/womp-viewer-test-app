@@ -1,0 +1,23 @@
+{
+  "name": "womp-viewer-test-app",
+  "version": "1.0.0",
+  "description": "This app uses Three.JS to render DRACO files in the browser. Just open the index.html file to view a file that's being rendered.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://unilimes@github.com/HunterFortuin/womp-viewer-test-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HunterFortuin/womp-viewer-test-app/issues"
+  },
+  "homepage": "https://github.com/HunterFortuin/womp-viewer-test-app#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "http-server": "^0.11.1"
+  }
+}
