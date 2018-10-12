@@ -39,7 +39,7 @@ $(document).ready(function () {
 	});
 
 	scene = new THREE.Scene();
-	scene.background = new THREE.Color(0xffffff);
+	scene.background = new THREE.Color(0xfffff0);
 	scene.fog = new THREE.Fog(0x050505, 2000, 3500);
 	scene.add(new THREE.AmbientLight(0x444444));
 
@@ -52,7 +52,7 @@ $(document).ready(function () {
 	light2.position.set(-1, -1, 1);
 	scene.add(light2);
 
-	var renderer = new THREE.WebGLRenderer({antialias: false});
+	var renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setClearColor(scene.fog.color);
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -76,13 +76,33 @@ $(document).ready(function () {
 		nexus_obj.position.set(p.x * s, p.y * s, p.y * s); //.set(p.x, p.y, p.z); // = p; //.set(p.x, p.y, p.z);
 		nexus_obj.scale.set(s, s, s);
 		redraw = true;
+
+		console.log(nexus_obj);
+		//
+		// var geometry = nexus_obj.geometry;
+		//
+		// var material = new THREE.MeshStandardMaterial({color: 0xffffff});
+		//
+		// if (geometry instanceof THREE.BufferGeometry) {
+		// 	geometry = new THREE.Geometry().fromBufferGeometry(geometry);
+		// }
+		//
+		// var mesh = new THREE.Mesh(geometry, material);
+		// mesh.castShadow = true;
+		// mesh.receiveShadow = true;
+		// //mesh.geometry.mergeVertices();
+		// mesh.geometry.computeVertexNormals();
+		// scene.add(mesh);
 	}
 
 	var nexus_obj = new NexusObject(model, onNexusLoad, function () {
 		redraw = true;
-	}, renderer);
+	}, renderer, new THREE.MeshStandardMaterial({color: 0xffffff}));
 
-	console.log(nexus_obj);
+	//console.log(nexus_obj);
+
+
+
 	scene.add(nexus_obj);
 
 	window.addEventListener('resize', onWindowResize, false);
